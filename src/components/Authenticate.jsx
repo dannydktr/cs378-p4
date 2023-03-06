@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
-
+import Notetake from './Notetake';
 
 export default function Authenticate() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoggedin, setIsLoggedin] = useState(false);
-
-
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
@@ -48,6 +46,13 @@ export default function Authenticate() {
             <button onClick={handleRegister}>Create an Account</button>
             {isLoggedin ? (
                 <button onClick={handleLogOut}>Log Out</button>
+            ):(
+                <></>
+            )}
+            {isLoggedin ? (
+                <div>
+                <Notetake/>
+                </div>
             ):(
                 <></>
             )}
