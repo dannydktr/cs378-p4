@@ -1,16 +1,32 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
-//import { uid } from 'uid';
+import {set, ref} from 'firebase/database';
+import { uid } from 'uid';
 
 export default function Notetake() {
-  return (
-    <div>
-        <h2>Notetaker</h2>
+
+    const [note, setNote] = useState('');
+    const [listOfNotes, setListOfNotes] = useState([]);
+
+
+    const writeToDatabase = () => {
+        const cur_uid = uid();
+        set(ref(db, `/${auth.currentUser.uid}/${cur_uid}`), {
+            note: note,
+            cur_uid: cur_uid,
+        })
+        setNote("");
+    };
+
+
+    return (
         <div>
-            <input type="test" placeholder="add text"></input>
-            <button>add</button>
+            <h2>Notetaker</h2>
+            <div>
+                <input type="text" placeholder="add text" value={note} onChange={(e) => setNote(e.target.value)}></input>
+                <button onClick={writeToDatabase}>add</button>
+            </div>
         </div>
-    </div>
-  )
+    )
 }
