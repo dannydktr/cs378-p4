@@ -1,13 +1,29 @@
-import React, { useState } from 'react'
-import { signOut, onAuthStateChanged } from 'firebase/auth';
+import React, { useState, useEffect } from 'react'
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import {set, ref} from 'firebase/database';
+import {set, ref, onValue} from 'firebase/database';
 import { uid } from 'uid';
 
 export default function Notetake() {
 
     const [note, setNote] = useState('');
     const [listOfNotes, setListOfNotes] = useState([]);
+
+    useEffect(() => {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                onValue(ref(db, `/${auth.currentUser.uid}`), snapshot => {
+                    setListOfNotes([]);
+                    const data = snapshot.val();
+                    if (data != null) {
+                        Object.values(data).map(note => {
+                            setListOfNotes((oldArray) => [...oldArray, note]);
+                        })
+                    }
+                })                
+            }
+        })
+    }, []);
 
 
     const writeToDatabase = () => {
@@ -26,6 +42,13 @@ export default function Notetake() {
             <div>
                 <input type="text" placeholder="add text" value={note} onChange={(e) => setNote(e.target.value)}></input>
                 <button onClick={writeToDatabase}>add</button>
+                {
+                    listOfNotes.map(note => (
+                        <div>
+                            <li>{note.note}</li>
+                        </div>
+                    ))
+                }
             </div>
         </div>
     )

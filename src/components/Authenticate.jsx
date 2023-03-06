@@ -21,15 +21,14 @@ export default function Authenticate() {
         signInWithEmailAndPassword(auth, email, password).then(() => {
             console.log('Sign in Successful!');
             setIsLoggedin(true);
-        }).catch((error) =>
-            alert(error.message));
+        }).catch((error) => alert(error.message));
     }
 
     const handleLogOut = () => {
         signOut(auth).then(() => {
             setIsLoggedin(false);
             console.log('Sign Out Successful!')
-        }).catch(error => {alert(error.message)});
+        }).catch(error => alert(error.message));
     }
 
     const handleRegister = () => {
@@ -46,6 +45,13 @@ export default function Authenticate() {
             <button onClick={handleRegister}>Create an Account</button>
             {isLoggedin ? (
                 <button onClick={handleLogOut}>Log Out</button>
+            ):(
+                <></>
+            )}
+            {isLoggedin ? (
+                <div>
+                Logged in as {auth.currentUser.email}
+                </div>
             ):(
                 <></>
             )}
