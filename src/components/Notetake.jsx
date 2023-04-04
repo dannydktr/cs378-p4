@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import {set, ref, onValue} from 'firebase/database';
+import {set, ref, onValue, remove} from 'firebase/database';
 import { uid } from 'uid';
 
 export default function Notetake() {
@@ -35,6 +35,13 @@ export default function Notetake() {
         setNote("");
     };
 
+    //update
+
+
+    //delete
+    const handleDelete = (uid) => {
+        remove(ref(db, `/${auth.currentUser.uid}/${uid}`))
+    }
 
     return (
         <div>
@@ -46,6 +53,8 @@ export default function Notetake() {
                     listOfNotes.map(note => (
                         <div>
                             <li>{note.note}</li>
+                            <button> update </button>
+                            <button onClick={() => handleDelete(note.cur_uid)}> delete </button>
                         </div>
                     ))
                 }
