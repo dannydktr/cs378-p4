@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import {set, ref, onValue, remove} from 'firebase/database';
+import { set, ref, onValue, remove, update } from 'firebase/database';
 import { uid } from 'uid';
 
 export default function Notetake() {
 
     const [note, setNote] = useState('');
     const [listOfNotes, setListOfNotes] = useState([]);
+    const [isEdit, setIsEdit] = useState(false);
+    const [tempUid, setTempUid] = useState('');
 
     useEffect(() => {
         auth.onAuthStateChanged(user => {
@@ -20,7 +22,7 @@ export default function Notetake() {
                             setListOfNotes((oldArray) => [...oldArray, note]);
                         })
                     }
-                })                
+                })
             }
         })
     }, []);
@@ -36,11 +38,24 @@ export default function Notetake() {
     };
 
     //update
+    const handleUpdate = (note) => {
+        setIsEdit(true);
+        setNote(note.note);
+        setTempUid(note.cur_uid);
+    }
+
+    const handleEditConfirm = () => {
+        update(ref(db, `/${auth.currentUser.uid}/${tempUid}`), {
+            note: note,
+            cur_uid: tempUid,
+        });
+        setNote('');
+    }
 
 
     //delete
     const handleDelete = (uid) => {
-        remove(ref(db, `/${auth.currentUser.uid}/${uid}`))
+        remove(ref(db, `/${auth.currentUser.uid}/${uid}`));
     }
 
     return (
@@ -48,12 +63,17 @@ export default function Notetake() {
             <h2>Notetaker</h2>
             <div>
                 <input type="text" placeholder="add text" value={note} onChange={(e) => setNote(e.target.value)}></input>
-                <button onClick={writeToDatabase}>add</button>
+                {isEdit ? (<div>
+                    <button onClick={handleEditConfirm}>confirm</button>
+                </div>) :
+                    (<div>
+                        <button onClick={writeToDatabase}>add</button>
+                    </div>)}
                 {
                     listOfNotes.map(note => (
                         <div>
                             <li>{note.note}</li>
-                            <button> update </button>
+                            <button onClick={() => handleUpdate(note)}> update </button>
                             <button onClick={() => handleDelete(note.cur_uid)}> delete </button>
                         </div>
                     ))
