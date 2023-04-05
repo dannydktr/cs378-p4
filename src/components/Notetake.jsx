@@ -50,6 +50,7 @@ export default function Notetake() {
             cur_uid: tempUid,
         });
         setNote('');
+        setIsEdit(false);
     }
 
 
